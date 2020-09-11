@@ -3,17 +3,17 @@ export default async ({ addon, global }) => {
   global.snapshots = [];
   const vm = await addon.tab.getScratchVM();
 
-  const getSnapshot = thread => {
+  const getSnapshot = (thread) => {
     const { target } = thread;
     const { runtime } = vm;
     const { ioDevices } = runtime;
     const stage = runtime.getTargetForStage();
     const stackFrame = thread.peekStackFrame();
 
-    const [ rightFence, topFence ] = target.keepInFence(48000, 36000);
-    const [ leftFence, bottomFence ] = target.keepInFence(-48000, -36000);
+    const [rightFence, topFence] = target.keepInFence(48000, 36000);
+    const [leftFence, bottomFence] = target.keepInFence(-48000, -36000);
 
-    return ({
+    return {
       basic: {
         threads: runtime.threads.length,
         cloneCount: runtime._cloneCounter,
@@ -22,15 +22,15 @@ export default async ({ addon, global }) => {
         mouse: {
           x: ioDevices.mouse._scratchX,
           y: ioDevices.mouse._scratchY,
-          down: ioDevices.mouse._isDown
+          down: ioDevices.mouse._isDown,
         },
-        targetOrder: runtime.executableTargets.map(t => ({
+        targetOrder: runtime.executableTargets.map((t) => ({
           name: t.getName(),
           id: t.id,
           isOriginal: t.isOriginal,
-          isStage: t.isStage
+          isStage: t.isStage,
         })),
-        args: Object.assign({}, stackFrame.params)
+        args: Object.assign({}, stackFrame.params),
       },
       target: {
         id: target.id,
@@ -52,39 +52,43 @@ export default async ({ addon, global }) => {
           rightFence,
           topFence,
           leftFence,
-          bottomFence
+          bottomFence,
         },
-        customState: JSON.parse(JSON.stringify(target._customState))
+        customState: JSON.parse(JSON.stringify(target._customState)),
       },
-      localVariables: Object.keys(target.variables).map(key => {
-        const v = target.variables[key];
-        if (v.type === 'broadcast_msg') return;
-        return ({
-          id: key,
-          name: v.name,
-          type: v.type,
-          value: Array.isArray(v.value) ? v.value.slice(0) : v.value
-        });
-      }).filter(Boolean),
-      globalVariables: Object.keys(stage.variables).map(key => {
-        const v = stage.variables[key];
-        if (v.type === 'broadcast_msg') return;
-        return ({
-          id: key,
-          name: v.name,
-          type: v.type,
-          value: Array.isArray(v.value) ? v.value.slice(0) : v.value
-        });
-      }).filter(Boolean),
+      localVariables: Object.keys(target.variables)
+        .map((key) => {
+          const v = target.variables[key];
+          if (v.type === "broadcast_msg") return;
+          return {
+            id: key,
+            name: v.name,
+            type: v.type,
+            value: Array.isArray(v.value) ? v.value.slice(0) : v.value,
+          };
+        })
+        .filter(Boolean),
+      globalVariables: Object.keys(stage.variables)
+        .map((key) => {
+          const v = stage.variables[key];
+          if (v.type === "broadcast_msg") return;
+          return {
+            id: key,
+            name: v.name,
+            type: v.type,
+            value: Array.isArray(v.value) ? v.value.slice(0) : v.value,
+          };
+        })
+        .filter(Boolean),
       stage: {
         tempo: stage.tempo,
         videoTransparency: stage.videoTransparency,
-        videoState: stage.videoState
-      }
-    });
+        videoState: stage.videoState,
+      },
+    };
   };
 
-  const getStackTrace = thread => {
+  const getStackTrace = (thread) => {
     const { stack, stackFrames, target } = thread;
     const stackTrace = [];
     stack.forEach((blockId, i) => {
@@ -95,36 +99,36 @@ export default async ({ addon, global }) => {
         procedure = {
           proccode: block.mutation.proccode,
           warp: block.mutation.warp.toString() === "true",
-          params: Object.assign({}, stackFrame.params)
+          params: Object.assign({}, stackFrame.params),
         };
       }
       stackTrace.unshift({
         block: {
           id: blockId,
-          opcode: block.opcode
+          opcode: block.opcode,
         },
         procedure,
         stackFrame: {
-          executionContext: Object.assign({}, stackFrame.executionContext)
+          executionContext: Object.assign({}, stackFrame.executionContext),
         },
         target: {
           name: target.getName(),
           id: target.id,
           isStage: target.isStage,
-          isOriginal: target.isOriginal
-        }
+          isOriginal: target.isOriginal,
+        },
       });
     });
     return stackTrace;
-  }
+  };
 
   const oldStepToProcedure = vm.runtime.sequencer.stepToProcedure;
   vm.runtime.sequencer.stepToProcedure = function (thread, proccode) {
-    if (proccode.startsWith('take debug snapshot')) {
+    if (proccode.startsWith("take debug snapshot")) {
       global.snapshots.unshift(getSnapshot(thread));
       return;
     }
-    if (proccode.startsWith('take stack trace')) {
+    if (proccode.startsWith("take stack trace")) {
       global.stackTraces.unshift(getSnapshot(thread));
       return;
     }
