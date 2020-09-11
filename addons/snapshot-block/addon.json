@@ -1,0 +1,25 @@
+{
+  "name": "Snapshot Block",
+  "description": "Generates snapshot - name your block 'take debug snapshot'.",
+  "userscripts": [
+    {
+      "url": "block-impl.js",
+      "matches": ["https://scratch.mit.edu/projects/*"],
+      "runAtComplete": false
+    },
+    {
+      "url": "debugger-ui.js",
+      "matches": ["https://scratch.mit.edu/projects/*"],
+      "runAtComplete": false
+    }
+  ],
+  "userstyles": [
+    {
+      "url": "debugger-ui.css",
+      "matches": ["https://scratch.mit.edu/projects/*"]
+    }
+  ],
+  "options": [],
+  "tags": ["editor"],
+  "enabled_by_default": false
+}

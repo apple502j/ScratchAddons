@@ -1,0 +1,9 @@
+.debugger {
+    position: absolute;
+    z-index: 16384;
+    top: 6rem;
+    left: 4rem;
+    background: white;
+    max-width: 15rem;
+    overflow-wrap: break-word;
+}
