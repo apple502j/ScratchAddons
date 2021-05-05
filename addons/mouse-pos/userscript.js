@@ -36,10 +36,7 @@ export default async function ({ addon, global, console }) {
   hideInSmallStageMode({ addon });
 
   while (true) {
-    let bar = await addon.tab.waitForElement('[class*="controls_controls-container"]', {
-      markAsSeen: true,
-      reduxEvents: ["scratch-gui/mode/SET_PLAYER"],
-    });
+    let bar = await addon.tab.waitForElement('[class*="controls_controls-container"]', { markAsSeen: true });
 
     if (addon.tab.editorMode === "editor") {
       // my attempt at detecting if they're in the editor?
@@ -64,10 +61,7 @@ export default async function ({ addon, global, console }) {
 
 async function hideInSmallStageMode({ addon }) {
   while (true) {
-    await addon.tab.waitForElement("[class*='stage-header_stage-size-toggle-group']", {
-      markAsSeen: true,
-      reduxEvents: ["scratch-gui/mode/SET_PLAYER"],
-    });
+    await addon.tab.waitForElement("[class*='stage-header_stage-size-toggle-group']", { markAsSeen: true });
 
     document.querySelector("[class*='stage-header_stage-button-first']").addEventListener("click", () => {
       document.querySelector(".pos-container-container").style.display = "none";

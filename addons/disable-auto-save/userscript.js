@@ -6,11 +6,7 @@ export default async ({ addon, console, msg }) => {
     console.log("Pending autosave prevented.");
   });
   while (true) {
-    const btn = await addon.tab.waitForElement('[class*="community-button_community-button_"]', {
-      markAsSeen: true,
-      reduxEvents: ["scratch-gui/mode/SET_PLAYER"],
-      condition: () => !addon.tab.redux.state.scratchGui.mode.isPlayerOnly,
-    });
+    const btn = await addon.tab.waitForElement('[class*="community-button_community-button_"]', { markAsSeen: true });
     btn.addEventListener(
       "click",
       (e) => {

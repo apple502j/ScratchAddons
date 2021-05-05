@@ -118,10 +118,7 @@ export default async function ({ addon, global, console, msg }) {
   };
 
   while (true) {
-    const flag = await addon.tab.waitForElement("[class^='green-flag']", {
-      markAsSeen: true,
-      reduxEvents: ["scratch-gui/mode/SET_PLAYER"],
-    });
+    const flag = await addon.tab.waitForElement("[class^='green-flag']", { markAsSeen: true });
     flag.insertAdjacentElement("afterend", img);
   }
 }
